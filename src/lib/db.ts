@@ -2,9 +2,9 @@ import { Pool, PoolConfig, QueryResult, QueryResultRow } from 'pg';
 
 const poolConfig: PoolConfig = {
     connectionString: process.env.POSTGRES_URL,
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    // max: 20,
+    // idleTimeoutMillis: 30000,
+    // connectionTimeoutMillis: 5000,
 }
 
 const pool = new Pool(poolConfig);
