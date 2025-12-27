@@ -22,7 +22,7 @@ const messages = [
     id: "4",
     message: "Nice to meet you, too.",
     role: "assistant"
-  }
+  },
 ]
 
 export default function Home() {
