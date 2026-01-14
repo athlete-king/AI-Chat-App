@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       await insertMessage(conversationId, m.role, content);
     }
 
+    // To get response from OpenAI API
     const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
