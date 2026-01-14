@@ -1,29 +1,24 @@
-import { Pool, PoolConfig, QueryResult, QueryResultRow } from 'pg';
+import { Pool } from "pg";
 
-const poolConfig: PoolConfig = {
-    connectionString: process.env.POSTGRES_URL,
-    // max: 20,
-    // idleTimeoutMillis: 30000,
-    // connectionTimeoutMillis: 5000,
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL,
+});
+
+export async function query(text: string, params?: any[]) {
+  return pool.query(text, params);
 }
 
-const pool = new Pool(poolConfig);
+export async function createConversation() {
+  const res = await query(
+    `INSERT INTO conversations DEFAULT VALUES RETURNING id`
+  );
+  return res.rows[0].id;
+}
 
-export default pool;
-
-// export async function query<T extends QueryResultRow>(
-//   text: string,
-//   params?: any[]
-// ): Promise<QueryResult<T>> {
-//   const start = Date.now();
-//   const client = await pool.connect();
-  
-//   try {
-//     const result = await client.query<T>(text, params);
-//     const duration = Date.now() - start;
-//     console.log('Executed query', { text, duration, rows: result.rowCount });
-//     return result;
-//   } finally {
-//     client.release();
-//   }
-// }
+export async function insertMessage(conversationId: number, role: string, content: string) {
+  const res = await query(
+    `INSERT INTO messages (conversation_id, role, content) VALUES ($1, $2, $3) RETURNING id`,
+    [conversationId, role, content]
+  );
+  return res.rows[0].id;
+}
