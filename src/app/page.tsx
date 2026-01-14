@@ -10,12 +10,14 @@ const initialMessages : Message[] = [];
 
 export default function Home() {
 	const [messages, setMessages] = useState(initialMessages);
-
+	
 	const sendMessage = useCallback(
 		async (text: string) => {
+      console.log("Sending message:", text);
 			const userMsg = { id: String(Date.now()), message: text, role: "user" };
 			setMessages((m) => [...m, userMsg]);
 
+			// To call our API route
 			const res = await fetch("/api/chat", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },

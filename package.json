@@ -12,6 +12,7 @@
     "@types/pg": "^8.16.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "lucide-react": "^0.560.0",
     "mysql2": "^3.16.0",
     "next": "16.0.7",

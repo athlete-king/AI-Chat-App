@@ -1,7 +1,15 @@
 import { Pool } from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const connectionString = process.env.POSTGRES_URL;
+const useSsl = process.env.POSTGRES_SSL === "true";
 
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
+  connectionString,
+  // allow connecting to many hosted Postgres providers that require SSL
+  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
 });
 
 export async function query(text: string, params?: any[]) {
