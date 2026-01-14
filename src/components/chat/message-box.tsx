@@ -3,15 +3,11 @@
 import { cn } from '@/lib/utils';
 
 const MessageBox = ({
-    messageId,
     role,
-    message,
-    date
+    message
 }: {
-    messageId?: string,
     role: string,
-    message: string,
-    date?: string
+    message: string
 }) => {
 
     return (
@@ -24,7 +20,7 @@ const MessageBox = ({
         >
             <div
                 className={cn(
-                    "rounded-lg p-3 max-w-xs",
+                    "rounded-lg p-3 max-w-xs md:max-w-sm lg:max-w-md",
                     role === "user" ? 
                         "bg-blue-500 text-white rounded-br-none" : "bg-gray-200 text-gray-800 rounded-bl-none"
                 )}

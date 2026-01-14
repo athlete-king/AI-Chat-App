@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
+    "dev": "next dev",
+    "predev": "node ./scripts/init-db.js",
     "start": "next start",
+    "prestart": "node ./scripts/init-db.js",
     "lint": "eslint"
   },
   "dependencies": {

@@ -8,7 +8,6 @@ const useSsl = process.env.POSTGRES_SSL === "true";
 
 const pool = new Pool({
   connectionString,
-  // allow connecting to many hosted Postgres providers that require SSL
   ssl: useSsl ? { rejectUnauthorized: false } : undefined,
 });
 

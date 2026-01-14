@@ -1,48 +1,72 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { MessageList } from "@/components/chat/message-list";
 import { ChatInput } from "@/components/chat/chat-input";
 import { cn } from "@/lib/utils";
-import type { Message } from "@/lib/type";
 
-const initialMessages : Message[] = [];
+type Message = {
+  id: string;
+  message: string;
+  role: "user" | "assistant" | string;
+};
+
+const initialMessages: Message[] = [];
 
 export default function Home() {
-	const [messages, setMessages] = useState(initialMessages);
-	
-	const sendMessage = useCallback(
-		async (text: string) => {
-      console.log("Sending message:", text);
-			const userMsg = { id: String(Date.now()), message: text, role: "user" };
-			setMessages((m) => [...m, userMsg]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-			// To call our API route
-			const res = await fetch("/api/chat", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ messages: [...messages, userMsg] }),
-			});
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages.length]);
 
-			const data = await res.json();
-			if (data?.assistant) {
-				const assistantMsg = {
-					id: String(Date.now() + 1),
-					message: data.assistant,
-					role: "assistant",
-				};
-				setMessages((m) => [...m, assistantMsg]);
-			}
-		},
-		[messages]
-	);
+  const sendMessage = useCallback(
+    async (text: string) => {
+      const userMsg: Message = { id: String(Date.now()), message: text, role: "user" };
+      setMessages((m) => [...m, userMsg]);
 
-	return (
-		<div className={cn("w-[100%] flex justify-center")}>
-			<div className={cn("w-[45%]", "fixed bottom-10")}>
+      const payload = { messages: [...messages, userMsg] };
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_CLIENT_KEY ?? ""}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (data?.assistant) {
+          const assistantMsg: Message = {
+            id: String(Date.now() + 1),
+            message: data.assistant,
+            role: "assistant",
+          };
+          setMessages((m) => [...m, assistantMsg]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [messages]
+  );
+
+  return (
+    <div className={cn("w-[100%] flex justify-center mt-5")}>
+		<div className={cn("w-[45%] h-[95vh] flex flex-col rounded-md overflow-hidden")}>
+			<div className={cn("flex-1 overflow-y-auto p-4 no-scrollbar")} 
+				style={{ scrollBehavior: "smooth"}}
+			>
 				<MessageList messages={messages} />
+				<div ref={bottomRef} />
+			</div>
+			<div>
 				<ChatInput onSend={sendMessage} />
 			</div>
 		</div>
-	);
+    </div>
+  );
 }
