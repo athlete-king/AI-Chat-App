@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       console.error("OpenAI error:", openaiRes.status, text);
       return NextResponse.json({ error: text }, { status: openaiRes.status || 500 });
     }
-
+    
     const data = await openaiRes.json();
     const assistantText =
       data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text ?? "";
