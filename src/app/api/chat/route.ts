@@ -6,7 +6,6 @@ dotenv.config();
 
 export async function POST(req: Request) {
   try {
-    // simple access control: require client to send API key (Authorization: Bearer <key> or x-api-key)
     const authHeader = req.headers.get("authorization") ?? "";
     const bearer = authHeader.startsWith("Bearer ") ? authHeader.replace("Bearer ", "").trim() : "";
     const apiKeyHeader = req.headers.get("x-api-key") ?? "";
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
     }
 
     const conversationId = await createConversation();
-    console.log("conversationId:", conversationId);
+
     for (const m of messages) {
       const content = m.message ?? m.content ?? "";
       await insertMessage(conversationId, m.role, content);
