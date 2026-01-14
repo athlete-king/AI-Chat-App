@@ -1,8 +1,21 @@
 import { NextResponse } from "next/server";
 import { createConversation, insertMessage } from "@/lib/db";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export async function POST(req: Request) {
   try {
+    // simple access control: require client to send API key (Authorization: Bearer <key> or x-api-key)
+    const authHeader = req.headers.get("authorization") ?? "";
+    const bearer = authHeader.startsWith("Bearer ") ? authHeader.replace("Bearer ", "").trim() : "";
+    const apiKeyHeader = req.headers.get("x-api-key") ?? "";
+    const clientKey = bearer || apiKeyHeader;
+
+    if (process.env.API_CLIENT_KEY && clientKey !== process.env.API_CLIENT_KEY) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const messages = body.messages;
     if (!messages || !Array.isArray(messages)) {
@@ -10,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     const conversationId = await createConversation();
-
+    console.log("conversationId:", conversationId);
     for (const m of messages) {
       const content = m.message ?? m.content ?? "";
       await insertMessage(conversationId, m.role, content);
@@ -31,7 +44,8 @@ export async function POST(req: Request) {
 
     if (!openaiRes.ok) {
       const text = await openaiRes.text();
-      return NextResponse.json({ error: text }, { status: 500 });
+      console.error("OpenAI error:", openaiRes.status, text);
+      return NextResponse.json({ error: text }, { status: openaiRes.status || 500 });
     }
 
     const data = await openaiRes.json();
@@ -42,6 +56,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ assistant: assistantText });
   } catch (err: any) {
+    console.error("API error:", err?.stack ?? err);
     return NextResponse.json({ error: err.message ?? String(err) }, { status: 500 });
   }
 }

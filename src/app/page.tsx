@@ -13,6 +13,7 @@ export default function Home() {
 
 	const sendMessage = useCallback(
 		async (text: string) => {
+      console.log("Sending message:", text);
 			const userMsg = { id: String(Date.now()), message: text, role: "user" };
 			setMessages((m) => [...m, userMsg]);
 
