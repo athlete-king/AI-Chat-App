@@ -15,6 +15,7 @@ const initialMessages: Message[] = [];
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function Home() {
     async (text: string) => {
       const userMsg: Message = { id: String(Date.now()), message: text, role: "user" };
       setMessages((m) => [...m, userMsg]);
+      setIsLoading(true);
 
       const payload = { messages: [...messages, userMsg] };
 
@@ -49,6 +51,8 @@ export default function Home() {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     },
     [messages]
@@ -60,7 +64,7 @@ export default function Home() {
 			<div className={cn("flex-1 overflow-y-auto p-4 no-scrollbar")} 
 				style={{ scrollBehavior: "smooth"}}
 			>
-				<MessageList messages={messages} />
+        <MessageList messages={messages} isLoading={isLoading} />
 				<div ref={bottomRef} />
 			</div>
 			<div>
