@@ -4,11 +4,14 @@ import { cn } from '@/lib/utils';
 
 import { MessageBox } from "./message-box";
 import { type Message } from '@/lib/type';
+import { TypingIndicator } from './typing-indicator';
 
 const MessageList = ({
-    messages
+    messages,
+    isLoading
 }: {
     messages: Message[],
+    isLoading?: boolean
 }) => {
     
     return (
@@ -23,6 +26,15 @@ const MessageList = ({
                         key={item.id}
                     />
                 })
+            }
+            {
+                isLoading ? (
+                    <div className="mb-4">
+                        <div className={cn("flex justify-start")}> 
+                            <TypingIndicator />
+                        </div>
+                    </div>
+                ) : null
             }
         </div>
     )
